@@ -1,8 +1,13 @@
 import 'dotenv/config'
 import fastify from 'fastify';
 import { authRoutes } from './routes/auth';
+import jwt from '@fastify/jwt'
 
 const server = fastify({ logger: true });
+
+server.register(jwt, {
+  secret: process.env.JWT_SECRET || 'supersecret'
+})
 
 server.register(authRoutes, {prefix: '/api/auth'})
 
