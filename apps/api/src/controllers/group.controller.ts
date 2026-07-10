@@ -48,7 +48,7 @@ export async function inviteToGroup(request: FastifyRequest, reply: FastifyReply
         where: {email}
     })
 
-    if(invitedUser){
+    if(!invitedUser){
         return reply.status(404).send({message: 'The person you are invited is not exist.'})
     }
 
@@ -73,3 +73,19 @@ export async function inviteToGroup(request: FastifyRequest, reply: FastifyReply
   })
   return reply.status(201).send({ message: 'User invited successfully', member: newMember }) // test it 
 }
+
+export async function groupList(request: FastifyRequest, reply: FastifyReply) {
+    const userId = request.user.id
+
+    const grouplist = await prisma.groupMembers.findMany({
+        where: {
+            user_id: userId // sadece benim üye olduğum gruplar
+        },
+        include: {
+            group: true // group bilgileri de getir
+        }
+    })
+
+    return reply.send(grouplist)
+}
+
