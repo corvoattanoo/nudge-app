@@ -1,7 +1,13 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import bcrypt from 'bcrypt'
 import prisma from '../lib/prisma'
-import { validateHeaderName } from "http";
+
+declare module '@fastify/jwt'{
+  interface FastifyJWT{
+    payload: {id: number, email: string, username: string}
+    user: { id: number; email: string; username: string }
+  }
+}
 
 export async function register(request: FastifyRequest, reply: FastifyReply) {
   const { email, username, password } = request.body as {
@@ -46,8 +52,8 @@ export async function login(request: FastifyRequest, reply: FastifyReply) {
 
   //generate token
   const token = request.server.jwt.sign({
+    id: user.id,
     email: user.email,
-    password: user.password_hash,
     username: user.username
   })
 

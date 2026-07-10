@@ -20,4 +20,35 @@ model User {
   avatarUrl     String?  @db.Text
   createdAt     DateTime @default(now()) @db.Timestamptz
   updatedAt     DateTime @updatedAt @db.Timestamptz
+
+  groupsCreated Group[]
+  groupMemberships GroupMembers[]
+}
+
+model Group {
+  id        Int    @id @default(autoincrement())
+  groupName String
+
+  created_by_id Int
+  created_by    User @relation(fields: [created_by_id], references: [id])
+
+  createdAt DateTime @default(now()) @db.Timestamptz
+  groupMembers GroupMembers[]
+}
+
+model GroupMembers {
+  id       Int @id @unique @default(autoincrement())
+  group_id Int
+
+  user_id Int
+  role    GroupRole @default(MEMBER)
+
+  group Group @relation(fields: [group_id], references: [id])
+  user  User  @relation(fields: [user_id], references: [id]) 
+  //group modeldeki user_id ile referansdaki user id islesiyor 
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
 }
