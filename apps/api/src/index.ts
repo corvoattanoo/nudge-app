@@ -3,6 +3,7 @@ import fastify from 'fastify';
 import { authRoutes } from './routes/auth';
 import { groupRoutes } from './routes/group'
 import jwt from '@fastify/jwt'
+import { eventsRoutes } from './routes/event';
 
 const server = fastify({ logger: true });
 
@@ -13,6 +14,8 @@ server.register(jwt, {
 server.register(groupRoutes, {prefix: '/api/groups'})
 
 server.register(authRoutes, {prefix: '/api/auth'})
+
+server.register(eventsRoutes, {prefix: '/api/events'})
 
 server.get('/health', async (request, reply) => {
   return { status: 'ok' };

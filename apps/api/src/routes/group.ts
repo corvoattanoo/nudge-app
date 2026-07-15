@@ -3,7 +3,7 @@ import { createGroup, groupList, inviteToGroup } from '../controllers/group.cont
 import { authenticate } from '../middlewares/authenticate'
 
 export async function groupRoutes(fastify: FastifyInstance) {
-    fastify.addHook('onRequest', authenticate)
+    //fastify.addHook('onRequest', authenticate)
     fastify.post('/create', createGroup)
     fastify.post('/invite', inviteToGroup)
     fastify.get('/grouplist', groupList)
