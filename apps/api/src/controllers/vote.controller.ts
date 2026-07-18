@@ -7,6 +7,7 @@ const { event_share_id, decision } = request.body as {
       event_share_id: number;
       decision: "YES" | "NO";
     };
+    
     try {
       const result = await castVote({
         eventShareId: event_share_id,

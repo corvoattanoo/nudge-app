@@ -1,8 +1,14 @@
 import prisma from "../lib/prisma";
 
-type VoteDatabase = Pick<typeof prisma, "event_shares" | "groupMembers" | "vote">;
+type VoteDatabase = Pick<typeof prisma, "event_shares" | "groupMembers" | "vote" | "plan">;
 
 export type VoteDecision = "APPROVE" | "REJECT";
+
+type CastVoteInput = {
+  eventShareId: number;
+  userId: number;
+  decision: VoteDecision;
+};
 
 export class VoteServiceError extends Error {
   constructor(
@@ -18,15 +24,11 @@ export class VoteServiceError extends Error {
  * Saves one member's vote, then resolves the shared event once more than half
  * of the group's members have cast the same decision.
  */
-export async function castVote({
-  eventShareId,
-  userId,
-  decision,
-}: {
-  eventShareId: number;
-  userId: number;
-  decision: VoteDecision;
-}) {
+export async function castVote(data: CastVoteInput) {
+  const eventShareId = data.eventShareId;
+  const userId = data.userId;
+  const decision = data.decision;
+
   return prisma.$transaction(async (tx) => {
     const eventShare = await tx.event_shares.findUnique({
       where: { id: eventShareId },
@@ -105,6 +107,23 @@ export async function checkVoteMajority(
       where: { id: eventShareId },
       data: { status },
     });
+  }
+
+  if(status == "APPROVED"){
+    const share = await tx.event_shares.findUnique({
+      where: {id: eventShareId},
+      select: {event_id: true, group_id: true}
+    });
+
+    await tx.plan.create({
+      data: {
+        event_share_id: eventShareId,
+        group_id: share!.group_id,
+        event_id: share!.event_id,
+        meetTime: new Date(),  // placeholder, kullanıcı sonra güncelleyecek
+        status: 'UPCOMING'
+      }
+    })
   }
 
   return { memberCount, votesNeeded, approveVotes, rejectVotes, status };

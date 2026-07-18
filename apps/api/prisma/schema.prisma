@@ -37,6 +37,7 @@ model Group {
   createdAt DateTime @default(now()) @db.Timestamptz
   groupMembers GroupMembers[]
   eventShares event_shares[]
+  plans plan[]
 }
 
 model GroupMembers {
@@ -72,6 +73,7 @@ model Event {
   sourceUrl String @db.Text
   createdAt DateTime @default(now()) @db.Timestamptz
   eventShares event_shares[]
+  plans plan[]
 }
 
 model event_shares {
@@ -87,6 +89,7 @@ model event_shares {
   sharedBy User @relation(fields: [user_id],references: [id])
 
   votes Vote[]
+  plan plan?
 }
 
 enum Status{
@@ -115,4 +118,26 @@ enum voteDecision{
   APPROVE
   REJECT
   PENDING
+}
+
+model plan{
+  id Int @id @default(autoincrement())
+  event_share_id Int @unique
+  group_id Int
+  event_id Int
+  meetTime DateTime
+  meetLocation String?
+  outfitNotes String?
+  status planStatus
+  created_at DateTime @default(now()) @db.Timestamptz()
+  updated_at DateTime @updatedAt @db.Timestamptz()
+
+  eventShare event_shares @relation(fields: [event_share_id], references: [id])
+  group Group @relation(fields: [group_id], references: [id])
+  event Event @relation(fields: [event_id], references: [id])
+}
+
+enum planStatus{
+  UPCOMING
+  PAST
 }
