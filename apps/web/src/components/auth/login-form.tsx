@@ -5,19 +5,42 @@ import { z } from "zod";
 import { login } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email"),
-  password: z.string().min(6, "Password should be atleast 6 characters"),
+  password: z.string().min(5, "Password should be atleast 5 characters"),
 });
 
 
 export function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter();
 
     // Hataları saklayacağımız state
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+    const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+    type LoginData = z.infer<typeof loginSchema>;
+
+    const mutation = useMutation({
+      mutationFn: ({email, password}: LoginData) => 
+        login(email, password),
+    
+    onSuccess: (data) => {
+                toast.success("Welcome back!");
+                console.log("Successfull:", data);
+                // Burada yönlendirme veya user state güncelleme işlemleri yapılabilir
+                localStorage.setItem("token", data.token);
+                router.push("/");
+            },
+            onError: (error) => {
+                toast.error("Invalid email or password");
+                console.error(error);
+            }
+  })
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -36,12 +59,8 @@ export function LoginForm() {
         }
         //if no error 
         setErrors({});
-        try {
-            const user = await login(email, password);
-            console.log(user);
-        } catch (error) {
-            console.error("Giriş hatası:", error);
-        } 
+        
+        mutation.mutate({email, password});
     }
 
     return (
@@ -68,8 +87,8 @@ export function LoginForm() {
           <p className="text-xs text-destructive">{errors.password}</p>
         )}
       </div>
-      <Button type="submit" variant="outline" className="w-full">
-        Login
+      <Button type="submit" variant="outline" className="w-full" disabled={mutation.isPending}>
+        {mutation.isPending ? "Logging in..." : "Login"}
       </Button>
     </form>
   );

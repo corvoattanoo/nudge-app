@@ -1,7 +1,7 @@
-const API_URL = "http://localhost:3000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3004/api";
 
 export async function login(email: string, password: string){
-    const respond = await fetch(`${API_URL}/auth/login`,{
+    const response = await fetch(`${API_URL}/auth/login`,{
         method: "POST",
         headers: {
             "content-Type": "application/json",
@@ -12,5 +12,9 @@ export async function login(email: string, password: string){
         }),
     });
 
-    return respond.json();
+    if (!response.ok) {
+    throw new Error("Login failed");
+  }
+
+    return response.json();
 }

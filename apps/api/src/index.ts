@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import cors from '@fastify/cors';
 import fastify from 'fastify';
 import { authRoutes } from './routes/auth';
 import { groupRoutes } from './routes/group'
@@ -8,6 +9,10 @@ import { votingRoutes } from './routes/vote';
 import { planRoutes } from './routes/plan';
 
 const server = fastify({ logger: true });
+server.register(cors, {
+  //origin: "*", // Geliştirme ortamında tüm kaynaklara izin vermek için '*' veya 'true' kullanabilirsiniz
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+});
 
 server.register(jwt, {
   secret: process.env.JWT_SECRET || 'supersecret'
