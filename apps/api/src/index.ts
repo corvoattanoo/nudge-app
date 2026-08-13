@@ -7,16 +7,20 @@ import jwt from '@fastify/jwt'
 import { eventsRoutes } from './routes/event';
 import { votingRoutes } from './routes/vote';
 import { planRoutes } from './routes/plan';
+import cookie from '@fastify/cookie'
 
 const server = fastify({ logger: true });
 server.register(cors, {
-  //origin: "*", // Geliştirme ortamında tüm kaynaklara izin vermek için '*' veya 'true' kullanabilirsiniz
+  origin: ["http://localhost:3000", "http://localhost:3001"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
 });
 
 server.register(jwt, {
   secret: process.env.JWT_SECRET || 'supersecret'
 })
+
+server.register(cookie, {secret: "supasecret"} )
 
 server.register(groupRoutes, {prefix: '/api/groups'})
 

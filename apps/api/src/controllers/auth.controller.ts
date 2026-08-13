@@ -57,5 +57,11 @@ export async function login(request: FastifyRequest, reply: FastifyReply) {
     username: user.username
   })
 
-  return reply.status(200).send({token})
+  //return reply.status(200).send({token})
+  reply.setCookie('token', token, {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    path: '/',
+  }).send({id: user.id, email: user.email, userName: user.username});
 }
