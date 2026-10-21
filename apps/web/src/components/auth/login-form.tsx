@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 const loginSchema = z.object({
@@ -20,6 +20,9 @@ export function LoginForm() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const from = searchParams.get("from") || "/";
 
     // Hataları saklayacağımız state
     const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -33,8 +36,8 @@ export function LoginForm() {
                 toast.success("Welcome back!");
                 console.log("Successfull:", data);
                 // Burada yönlendirme veya user state güncelleme işlemleri yapılabilir
-                localStorage.setItem("token", data.token);
-                router.push("/");
+                
+                router.push(from);
             },
             onError: (error) => {
                 toast.error("Invalid email or password");

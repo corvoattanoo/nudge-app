@@ -1,3 +1,5 @@
+import { register } from "module";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3004/api";
 
 export async function login(email: string, password: string) {
@@ -15,6 +17,28 @@ export async function login(email: string, password: string) {
 
     if (!response.ok) {
         throw new Error("Login failed");
+    }
+
+    return response.json();
+}
+
+export async function register(email: string, password: string, username: string){
+    const response = await fetch(`${API_URL}/auth/register`,{
+        method: "POST",
+        headers: {
+            "content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            email,
+            password,
+            username
+        }),
+        credentials: 'include',
+    });
+
+    if(!response.ok){
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.message || "Register fail");
     }
 
     return response.json();
