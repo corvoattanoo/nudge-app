@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
 
   const isAuthPage = pathname.startsWith("/login") || pathname.startsWith("/register");
   const isProtectedPage = pathname.startsWith('/events') || pathname.startsWith("/groups") ||
-  pathname.startsWith("/plans") || pathname.startsWith('/');
+  pathname.startsWith("/plans");
 
   if (isProtectedPage && !token) {
     const loginUrl = new URL("/login", request.url);
