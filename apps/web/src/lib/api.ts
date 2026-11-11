@@ -59,6 +59,49 @@ export interface EventItem {
   sourceUrl: string;
 }
 
+export interface UserGroupMembership {
+    id: number;
+    group_id: number;
+    user_id: number;
+    role: "ADMIN" | "MEMBER";
+    group: {
+        id: number;
+        groupName: string;
+        created_by_id: number;
+        createdAt: string;
+    };
+}
+
+export async function getUserGroups(): Promise<UserGroupMembership[]>{
+    const response = await fetch(`${API_URL}/groups/grouplist`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        },
+         credentials: "include",
+    })
+
+    if(!response.ok){
+        throw new Error("Failed to fetch groups");
+    }
+
+    return response.json();
+}
+
+export async function shareEventToGroups(eventId: number, groupId: number){
+    const response = await fetch(`${API_URL}/events/share`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event_id: eventId, group_id: groupId }),
+    credentials: "include",
+  });
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    throw new Error(errorData?.message || "Failed to share event");
+  }
+  return response.json();
+} 
+
 export async function getEvents(): Promise<EventItem[]> {
     const response = await fetch(`${API_URL}/events`, {
         method: "GET",
