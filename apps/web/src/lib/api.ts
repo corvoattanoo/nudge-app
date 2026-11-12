@@ -72,6 +72,22 @@ export interface UserGroupMembership {
     };
 }
 
+export async function createGroup(name: string): Promise<{id: number, groupName: string}> {
+    const response = await fetch(`${API_URL}/groups/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+        credentials: "include",
+    });
+
+    if(!response.ok){
+        const errorData = await response.json().catch(()=> null);
+        throw new Error(errorData || "Failed to create group")
+    }
+
+    return response.json();
+}
+
 export async function getUserGroups(): Promise<UserGroupMembership[]>{
     const response = await fetch(`${API_URL}/groups/grouplist`, {
         method: "GET",

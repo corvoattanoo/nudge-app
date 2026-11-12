@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserGroups, shareEventToGroups, EventItem } from "@/lib/api";
+import { getUserGroups, shareEventToGroups, EventItem, createGroup } from "@/lib/api";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +11,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"; // 👈 added Input
 import { toast } from "sonner";
-import { Users, Loader2 } from "lucide-react";
+import { Users, Loader2, Plus, ArrowBigLeft} from "lucide-react";
 
 interface ShareEventDialogProps {
   event: EventItem;
@@ -22,7 +23,17 @@ interface ShareEventDialogProps {
 
 export function ShareEventDialog({ event, isOpen, onClose }: ShareEventDialogProps) {
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
+  const [newGroupName, setGroupName] = useState("");
   const queryClient = useQueryClient();
+
+  // Helper to reset modal state when closing
+  function handleClose() {
+    onClose;
+    setSelectedGroupId(null);
+    setIsCreatingNew(false);
+    setGroupName("");
+  }
 
   // 1. Fetch user's groups
   const { data: groupMemberships, isLoading } = useQuery({
@@ -34,6 +45,11 @@ export function ShareEventDialog({ event, isOpen, onClose }: ShareEventDialogPro
   // 2. Share mutation
   const shareMutation = useMutation({
     mutationFn: () => {
+      // let targetGroupId = selectedGroupId;
+
+      // //if user hits nwe group
+      // if()
+
       if (!selectedGroupId) throw new Error("Please select a group");
       return shareEventToGroups(event.id, selectedGroupId);
     },
